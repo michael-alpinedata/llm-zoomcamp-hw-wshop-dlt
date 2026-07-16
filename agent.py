@@ -63,7 +63,7 @@ class SearchDeps:
 #   - tools are registered with @faq_agent.tool (no manual JSON schema)
 #   - the loop is built into run_sync() — we call it and get the answer back
 faq_agent = Agent(
-    'openai:gpt-5.4-mini',
+    'google:gemini-3.1-flash-lite',
     deps_type=SearchDeps,
     instructions=INSTRUCTIONS,
 )
