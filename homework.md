@@ -93,9 +93,9 @@ how many spans does a single agent run produce?
 Each span is either the agent run itself, an LLM call, or a tool call.
 The number can vary between runs because the model decides how many
 times to search.
-
+![q1](q1.png)
 * 1
-* 5
+* X 5
 * 15
 * 30
 
@@ -131,10 +131,11 @@ How many tables did dlt create? Check with:
 SELECT COUNT(*) FROM information_schema.tables 
 WHERE table_schema = 'agent_traces';
 ```
+![q2](q2.png)
 
 * 1
 * 3
-* 24
+* X 24
 * 100
 
 ## Question 3. Query traces with an agent
@@ -147,11 +148,37 @@ The token counts are stored in the span attributes as
 trace. The number depends on how many searches the agent made, so
 report the range it falls into:
 
+```python
+import duckdb
+
+con = duckdb.connect("agent_traces.duckdb")
+
+con.sql("""
+    SELECT column_name 
+    FROM information_schema.columns 
+    WHERE table_schema = 'agent_traces_data' 
+      AND table_name = 'traces'
+      AND column_name ILIKE '%token%'
+""").show()
+
+con.sql("""
+    SELECT trace_id, span_name, start_timestamp 
+    FROM agent_traces_data.traces 
+    ORDER BY start_timestamp DESC
+""").show()
+
+con.sql("""
+    SELECT SUM(attributes__gen_ai_usage_input_tokens) AS total_input_tokens
+    FROM agent_traces_data.traces
+    WHERE trace_id = '019f6cf99c6c7da442180139f73985b4'
+      AND span_name LIKE 'chat%'
+""").show()
+```
+
+![q3](q3.png)
+
 * 100 - 500
-* 1500 - 5000
+* X 1500 - 5000
 * 10000 - 20000
 * 50000 - 100000
 
-## Submit the results
-
-* Submit your results here: https://courses.datatalks.club/llm-zoomcamp-2026/homework/dlt
